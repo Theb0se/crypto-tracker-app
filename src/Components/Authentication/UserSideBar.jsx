@@ -15,7 +15,7 @@ export default function UserSideBar() {
     right: false,
   });
 
-  const { user, setalert, watchList, coins, symbol, Currency } = CryptoState();
+  const { user, setalert, watchList, coins, symbol } = CryptoState();
 
   const history = useHistory();
 
@@ -150,7 +150,7 @@ export default function UserSideBar() {
                   <span style={{ fontSize: 15, textShadow: "0 0 5px black" }}>
                     Watch List
                   </span>
-
+                  {/* eslint-disable-next-line */}
                   {coins.map((coin) => {
                     if (watchList.includes(coin.id)) {
                       return (
@@ -161,9 +161,9 @@ export default function UserSideBar() {
                             justifyContent: "space-between",
                             alignItems: "center",
                             backgroundColor: "#F7D716",
-                            padding:"0px 20px",
+                            padding: "0px 20px",
                             borderRadius: 10,
-                            color:"black"
+                            color: "black",
                           }}
                         >
                           <span
