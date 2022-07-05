@@ -72,7 +72,6 @@ export default function AuthModal() {
       });
   };
 
-  console.log(value);
   return (
     <ThemeProvider theme={darkTheme}>
       <div>

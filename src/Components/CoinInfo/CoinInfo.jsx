@@ -44,7 +44,7 @@ export default function CoinInfo({ coin }) {
       mode: "dark",
     },
   });
-  console.log(historicalData);
+ 
   return (
     <ThemeProvider theme={darkTheme}>
       <div className="charContainer">

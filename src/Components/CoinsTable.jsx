@@ -28,7 +28,8 @@ function CoinsTable() {
     fetchCoins();
     // eslint-disable-next-line
   }, [Currency]);
-  console.log(coins);
+
+  
 
   const darkTheme = createTheme({
     palette: {

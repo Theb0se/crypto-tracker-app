@@ -2,20 +2,40 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { CoinList } from "../Config/api";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
+import { doc, onSnapshot } from "firebase/firestore";
 const CryptoContext = createContext();
 
 function CryptoProvider({ children }) {
   const [Currency, setCurrency] = useState("INR");
   const [symbol, setsymbol] = useState("₹");
   const [coins, setcoins] = useState([]);
+  const [watchList, setWatchList] = useState([]);
   const [loading, setloading] = useState(false);
-  const [user, setuser] = useState(null);
+  const [user, setuser] = useState();
   const [alert, setalert] = useState({
     open: false,
     message: "",
     type: "",
   });
+
+  useEffect(() => {
+    if (user) {
+      const coinRef = doc(db, "watchlist", user?.uid);
+      var unsubscribe = onSnapshot(coinRef, (coin) => {
+        if (coin.exists()) {
+          const watchLists = coin?.data()?.coins;
+          setWatchList(watchLists);
+        } else {
+          console.log("No Items in Watch List");
+        }
+      });
+      return () => {
+        unsubscribe();
+      };
+    }
+    // eslint-disable-next-line
+  }, [user]);
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
@@ -53,6 +73,8 @@ function CryptoProvider({ children }) {
         alert,
         setalert,
         user,
+        watchList,
+        setWatchList,
       }}
     >
       {children}

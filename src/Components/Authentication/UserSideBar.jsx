@@ -1,18 +1,23 @@
 import React from "react";
 import Drawer from "@mui/material/Drawer";
-import { Avatar } from "@mui/material";
+import { Avatar, IconButton } from "@mui/material";
 import { CryptoState } from "../../Context/CryptoProvider";
 import Button from "@mui/material/Button";
-
+import DeleteIcon from "@mui/icons-material/Delete";
 import { signOut } from "firebase/auth";
-import { auth } from "../../firebase";
+import { auth, db } from "../../firebase";
+import { numberWithComma } from "../Banner/Carousal";
+import { useHistory } from "react-router-dom";
+import { doc, setDoc } from "firebase/firestore";
 
 export default function UserSideBar() {
   const [state, setState] = React.useState({
     right: false,
   });
 
-  const { user, setalert } = CryptoState();
+  const { user, setalert, watchList, coins, symbol, Currency } = CryptoState();
+
+  const history = useHistory();
 
   const toggleDrawer = (anchor, open) => (event) => {
     if (
@@ -23,6 +28,35 @@ export default function UserSideBar() {
     }
 
     setState({ ...state, [anchor]: open });
+  };
+
+  const hpush = (coin) => {
+    history.push(`/coins/${coin.id}`);
+  };
+
+  const removeWatchList = async (coin) => {
+    const coinRef = doc(db, "watchlist", user.uid);
+    try {
+      await setDoc(
+        coinRef,
+        {
+          coins: watchList.filter((watch) => watch !== coin?.id),
+        },
+        { merge: true }
+      );
+      setalert({
+        open: true,
+        message: `${coin.name} Remove From Watch List `,
+        type: "success",
+      });
+    } catch (error) {
+      setalert({
+        open: true,
+        message: error.message,
+        type: "error",
+      });
+      return;
+    }
   };
 
   const logout = () => {
@@ -104,7 +138,7 @@ export default function UserSideBar() {
                     width: "100%",
                     backgroundColor: "gray",
                     borderRadius: 10,
-                    padding: 15,
+                    padding: 5,
                     paddingTop: 10,
                     display: "flex",
                     flexDirection: "column",
@@ -116,6 +150,44 @@ export default function UserSideBar() {
                   <span style={{ fontSize: 15, textShadow: "0 0 5px black" }}>
                     Watch List
                   </span>
+
+                  {coins.map((coin) => {
+                    if (watchList.includes(coin.id)) {
+                      return (
+                        <div
+                          style={{
+                            width: "100%",
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            backgroundColor: "#F7D716",
+                            padding:"0px 20px",
+                            borderRadius: 10,
+                            color:"black"
+                          }}
+                        >
+                          <span
+                            style={{ fontWeight: "600" }}
+                            onClick={() => hpush(coin)}
+                          >
+                            {coin.name}
+                          </span>
+                          <span style={{ fontWeight: 400 }}>
+                            {symbol}
+                            {numberWithComma(coin?.current_price)}
+                          </span>
+                          <IconButton
+                            aria-label="delete"
+                            style={{ color: "#B22727" }}
+                            size="small"
+                            onClick={() => removeWatchList(coin)}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </div>
+                      );
+                    }
+                  })}
                 </div>
               </div>
               <Button
