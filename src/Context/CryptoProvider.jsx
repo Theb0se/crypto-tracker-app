@@ -35,7 +35,7 @@ function CryptoProvider({ children }) {
       };
     }
     // eslint-disable-next-line
-  }, [user]);
+  }, [user,Currency]);
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
